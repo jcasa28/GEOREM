@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.georem.data.Reminder
 import com.example.georem.ui.ReminderListScreen
 import com.example.georem.ui.theme.ReminderInputScreen
 
@@ -30,29 +31,24 @@ class MainActivity : ComponentActivity() {
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    //state to hold reminders
-    val reminders = remember { mutableStateOf(listOf<String>()) }
+    // List <Reminders>
+    val reminders = remember { mutableStateOf(listOf<Reminder>()) }
 
-    NavHost(
-        navController = navController,
-        startDestination = "reminder_list" // Initial screen
-    ) {
-        //reminder List Screen
+    NavHost(navController = navController, startDestination = "reminder_list") {
         composable("reminder_list") {
             ReminderListScreen(
-                reminders = reminders.value,  // Pass reminders list
+                reminders = reminders.value,
                 onAddReminderClick = { navController.navigate("reminder_input") }
             )
         }
 
-        // reminder input Screen
         composable("reminder_input") {
             ReminderInputScreen(
                 onSaveClick = { reminder ->
-                    reminders.value = reminders.value + reminder // Update list
-                    navController.popBackStack() // Navigate back to reminder list
+                    reminders.value = reminders.value + reminder // Add Reminder to the list
+                    navController.popBackStack() // Return to the list screen
                 },
-                onCancelClick = { navController.popBackStack() } // Cancel and go back
+                onCancelClick = { navController.popBackStack() }
             )
         }
     }

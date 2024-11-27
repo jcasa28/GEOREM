@@ -1,8 +1,8 @@
 package com.example.georem.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,14 +15,18 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.georem.data.Reminder
 
 @Composable
 fun ReminderListScreen(
-    reminders: List<String>, // reminder list from the inout screen
+    reminders: List<Reminder>,
     onAddReminderClick: () -> Unit
 ) {
     Column(
@@ -31,40 +35,46 @@ fun ReminderListScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        //reminder list
-        Column(modifier = Modifier.weight(1f)) {
-            // Button to add reminder
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Button(onClick = onAddReminderClick) {
-                    Text("Add New Reminder")
-                }
-            }
+        Button(onClick = onAddReminderClick, modifier = Modifier.fillMaxWidth()) {
+            Text("Add New Reminder")
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-            // Display reminders in a scrollable list, like the recycler view
-            LazyColumn {
-                items(reminders.size) { index ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        shape = RoundedCornerShape(8.dp),
-                        elevation = CardDefaults.cardElevation(4.dp),
-                    ) {
+        // Track expanded state for each reminder using a map of indices to booleans
+        LazyColumn {
+            items(reminders.size) { index ->
+                var isExpanded by remember { mutableStateOf(false) }
+                val reminder = reminders[index]
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                        .clickable { isExpanded = !isExpanded },  // Toggle expanded state
+                    shape = RoundedCornerShape(8.dp),
+                    elevation = CardDefaults.cardElevation(4.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = reminders[index],
-                            modifier = Modifier.padding(16.dp),
+                            text = reminder.name,
                             fontSize = 18.sp
                         )
+
+                        // Display additional details only if expanded
+                        if (isExpanded) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(text = "Latitude: ${reminder.latitude}")
+                            Text(text = "Longitude: ${reminder.longitude}")
+                            Text(text = "Radius: ${reminder.radius} meters")
+                            reminder.time?.let {
+                                Text(text = "Time: $it")
+                            }
+                        }
                     }
                 }
             }
         }
-
         // Map view
         MapScreen(
             modifier = Modifier

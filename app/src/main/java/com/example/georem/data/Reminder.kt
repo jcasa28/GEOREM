@@ -1,8 +1,10 @@
 package com.example.georem.data
 
 data class Reminder(
-    val id: Int = 0, // Auto-generated ID
-    val text: String,
+    val name: String,
     val latitude: Double,
-    val longitude: Double
+    val longitude: Double,
+    val radius: Float,
+    val time: Long? = null,
+    var isCompleted: Boolean = false
 )

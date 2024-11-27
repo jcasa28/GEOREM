@@ -2,6 +2,7 @@ package com.example.georem.ui.theme
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -11,41 +12,75 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.example.georem.data.Reminder
+import com.example.georem.ui.MapScreen
 
 @Composable
 fun ReminderInputScreen(
-    onSaveClick: (String) -> Unit, // On save, pass the reminder to MainActivity
-    onCancelClick: () -> Unit // On cancel, go back without saving
+    onSaveClick: (Reminder) -> Unit, // Pass Reminder object on save
+    onCancelClick: () -> Unit // On cancel, return to list screen
 ) {
-    var newReminder by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
+    var latitude by remember { mutableStateOf("") }
+    var longitude by remember { mutableStateOf("") }
+    var radius by remember { mutableStateOf("") }
+    var time by remember { mutableStateOf("") }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         // Name (Reminder)
         OutlinedTextField(
-            value = newReminder,
-            onValueChange = { newReminder = it },
-            label = { Text("Reminder") },
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Name") },
             modifier = Modifier.fillMaxWidth()
         )
-        // Location (Optional)
+
+        // Latitude
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
-            label = { Text("Location (Optional)") },
+            value = latitude,
+            onValueChange = { latitude = it },
+            label = { Text("Latitude") },
             modifier = Modifier.fillMaxWidth()
         )
-        // Time (Optional)
+
+        // Longitude
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = longitude,
+            onValueChange = { longitude = it },
+            label = { Text("Longitude") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // Radius
+        OutlinedTextField(
+            value = radius,
+            onValueChange = { radius = it },
+            label = { Text("Radius (meters)") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // Optional Time
+        OutlinedTextField(
+            value = time,
+            onValueChange = { time = it },
             label = { Text("Time (Optional)") },
             modifier = Modifier.fillMaxWidth()
         )
+
         // Save Button
         Button(
             onClick = {
-                if (newReminder.isNotBlank()) {
-                    onSaveClick(newReminder) // Pass the reminder back
+                if (name.isNotBlank() && latitude.isNotBlank() && longitude.isNotBlank() && radius.isNotBlank()) {
+                    onSaveClick(
+                        Reminder(
+                            name = name,
+                            latitude = latitude.toDouble(),
+                            longitude = longitude.toDouble(),
+                            radius = radius.toFloat(),
+                            time = time.toLongOrNull() // Handles optional time
+                        )
+                    )
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -60,5 +95,12 @@ fun ReminderInputScreen(
         ) {
             Text("Cancel")
         }
+
+        // Map view
+        MapScreen(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+        )
     }
 }
